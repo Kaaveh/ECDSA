@@ -1,4 +1,5 @@
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by kaaveh on 5/17/18.
@@ -7,7 +8,7 @@ public class Main {
 
     public static String message = "This is sample!";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         int a =-3;
         BigInteger b =new BigInteger("2455155546008943817740293915197451784769108058161191238065");
         point basePoint = new point(new BigInteger("602046282375688656758213480587526111916698976636884684818")

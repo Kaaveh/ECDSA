@@ -1,4 +1,7 @@
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 /**
@@ -80,7 +83,7 @@ public class ECCUtility {
         return r;
     }
 
-    public static SignaturePair ECDSASignatureGeneration(point p1, int a, BigInteger p, BigInteger q, BigInteger d){
+    public static SignaturePair ECDSASignatureGeneration(point p1, int a, BigInteger p, BigInteger q, BigInteger d) throws NoSuchAlgorithmException {
         BigInteger r;
         BigInteger s;
         BigInteger Ke;
@@ -94,15 +97,21 @@ public class ECCUtility {
         point RPoint = DoubleAndAdd(Ke, p1, a, p);
 
         r = RPoint.x;
-        s= r.multiply(d).add(BigInteger.valueOf(Main.message.hashCode()))
+
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(Main.message.getBytes(StandardCharsets.UTF_8));
+        s= r.multiply(d).add(new BigInteger(hash))
                 .multiply(Ke.modInverse(q)).mod(q);
 
         return new SignaturePair(r, s);
     }
 
-    public static String ECDSASignatureVerification(BigInteger r, BigInteger s, int a, BigInteger p, BigInteger q, point basePoint, point B){
+    public static String ECDSASignatureVerification(BigInteger r, BigInteger s, int a, BigInteger p, BigInteger q, point basePoint, point B) throws NoSuchAlgorithmException {
         BigInteger w = s.modInverse(q);
-        BigInteger u1 = w.multiply(BigInteger.valueOf(Main.message.hashCode())).mod(q);
+
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(Main.message.getBytes(StandardCharsets.UTF_8));
+        BigInteger u1 = w.multiply(new BigInteger(hash)).mod(q);
         BigInteger u2 = w.multiply(r).mod(q);
 
         point p1 = DoubleAndAdd(u1, basePoint, a, p);
